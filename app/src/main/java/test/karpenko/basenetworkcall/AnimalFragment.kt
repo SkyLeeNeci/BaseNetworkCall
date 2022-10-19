@@ -61,52 +61,36 @@ class AnimalFragment : Fragment() {
             .url(URL)
             .build()
 
-        client.newCall(request).enqueue(object : Callback {
-            override fun onFailure(call: okhttp3.Call, e: IOException) {
+        val okhttps =  client.newCall(request).execute()
+        if (okhttps.isSuccessful){
+            val string = okhttps.body?.string()
+            val userType = object : TypeToken<MutableList<Animal>>() {}.type
+            okHttpResponse = (Gson().fromJson(string, userType))
+            summaryResponse.addAll(okHttpResponse)
 
-            }
+        }
 
-            override fun onResponse(call: okhttp3.Call, response: okhttp3.Response) {
-                if (response.isSuccessful) {
-                    val string = response.body?.string()
-                    val userType = object : TypeToken<MutableList<Animal>>() {}.type
-                    okHttpResponse = (Gson().fromJson(string, userType))
-                    Log.d("RESPONSE", "okHttpResponse $okHttpResponse")
-                    summaryResponse.addAll(okHttpResponse)
-                    Handler(Looper.getMainLooper()).post {
-                        animalAdapter.differ.submitList(summaryResponse)
-                    }
-                }
-            }
-
-        })
     }
 
     private fun getRetrofitResponse()  {
-        AnimalApiFactory.animalService.getRandomAnimalsCount("5")
-            .enqueue(object : retrofit2.Callback<MutableList<Animal>> {
-                override fun onResponse(
-                    call: Call<MutableList<Animal>>,
-                    response: Response<MutableList<Animal>>
-                ) {
-                    retrofitResponse = response.body()!!
-                    Log.d("RESPONSE", "retrofitResponse $retrofitResponse")
-                    summaryResponse.addAll(retrofitResponse)
-                    Handler(Looper.getMainLooper()).post {
-                        animalAdapter.differ.submitList(summaryResponse)
-                    }
-                }
-                override fun onFailure(call: Call<MutableList<Animal>>, t: Throwable) {
-                    TODO("Not yet implemented")
-                }
-
-            })
+       val retrofitResponse1 = AnimalApiFactory.animalService.getRandomAnimalsCount("5").execute()
+        if (retrofitResponse1.isSuccessful){
+            retrofitResponse1.body()?.let { retrofitResponse = it }
+            summaryResponse.addAll(retrofitResponse)
+        }
     }
 
     fun init(){
-        getRetrofitResponse()
-        getOkHttpResponse()
-        Log.d("RESPONSE", "retrofitResponse $summaryResponse")
+        Thread{
+            getRetrofitResponse()
+            getOkHttpResponse()
+            Log.d("RESPONSE", "retrofitResponse $summaryResponse")
+            Handler(Looper.getMainLooper()).post{
+                animalAdapter.differ.submitList(summaryResponse)
+            }
+        }.start()
+
+
     }
 
 }
