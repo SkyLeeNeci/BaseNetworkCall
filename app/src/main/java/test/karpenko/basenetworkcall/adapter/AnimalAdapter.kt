@@ -45,7 +45,7 @@ class AnimalAdapter: RecyclerView.Adapter<AnimalAdapter.AnimalViewHolder>() {
         val animal = differ.currentList[position]
         holder.animalName.text = animal.name
         holder.animalLatinName.text = animal.latin_name
-        holder.animalId.text = animal.id
+        holder.animalId.text = animal.id.toString()
     }
 
     override fun getItemCount() = differ.currentList.size

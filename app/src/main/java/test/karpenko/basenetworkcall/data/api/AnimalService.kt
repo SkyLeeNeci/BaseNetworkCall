@@ -1,4 +1,4 @@
-package test.karpenko.basenetworkcall.api
+package test.karpenko.basenetworkcall.data.api
 
 import retrofit2.Call
 import retrofit2.Response

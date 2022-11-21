@@ -1,4 +1,4 @@
-package test.karpenko.basenetworkcall.api
+package test.karpenko.basenetworkcall.data.api
 
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
